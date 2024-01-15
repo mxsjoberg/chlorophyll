@@ -46,7 +46,7 @@ class CodeView(Text):
         color_scheme: dict[str, dict[str, str | int]] | str | None = None,
         tab_width: int = 4,
         linenums_theme: Callable[[], tuple[str, str]] | tuple[str, str] | None = None,
-        autohide_scrollbar: bool = False,
+        autohide_scrollbar: bool = True,
         **kwargs,
     ) -> None:
         self._frame = ttk.Frame(master)
