@@ -7,8 +7,6 @@ from tkinter import BaseWidget, Event, Misc, TclError, Text, ttk
 from tkinter.font import Font
 from typing import Any, Callable, Type, Union
 
-import tkinter.font as tkFont
-
 import pygments
 import pygments.lexer
 import pygments.lexers
