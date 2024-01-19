@@ -93,9 +93,12 @@ class CodeView(Text):
 # TEST
 # -------------------------------------------------------
 
-        if self.linenums: self._line_numbers.bind("<Button-1>", self._on_line_number_click)
+        if self.linenums:
+            self._line_numbers.bind("<Button-1>", self._on_line_number_click)
+            self._line_numbers.bind("<Double-Button-1>", self._on_line_number_click)
 
     def _on_line_number_click(self, event):
+        print("_on_line_number_click")
         x, y = event.x, event.y
         # get the line number from the y-coordinate
         line_number = int(self.index(f"@{x},{y}").split(".")[0])
