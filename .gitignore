@@ -131,3 +131,4 @@ dmypy.json
 # Mac stuff
 .DS_Store
 chlorophyll/.DS_Store
+chlorophyll/TkLineNums/
