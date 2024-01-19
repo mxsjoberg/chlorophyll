@@ -41,7 +41,7 @@ class CodeView(Text):
     def __init__(
         self,
         master: Misc | None = None,
-        lexer: LexerType = pygments.lexers.PythonLexer,
+        lexer: LexerType = pygments.lexers.TextLexer,
         color_scheme: dict[str, dict[str, str | int]] | str | None = None,
         tab_width: int = 4,
         linenums_theme: Callable[[], tuple[str, str]] | tuple[str, str] | None = None,
