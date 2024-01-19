@@ -1,7 +1,7 @@
 [editor]
-bg = "#0a0e14"
+bg = "#0f141d"
 fg = "#b3b1ad"
-select_bg = "#1b2733"
+select_bg = "#181d28"
 inactive_select_bg = "#1b2733"
 caret = "#b3b1ad"
 caret_width = 1
