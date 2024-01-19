@@ -12,7 +12,7 @@ import pygments.lexer
 import pygments.lexers
 import toml
 from pyperclip import copy
-from tklinenums import TkLineNumbers
+from .TkLineNums.tklinenums import TkLineNumbers
 
 from .schemeparser import _parse_scheme
 
