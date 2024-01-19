@@ -7,13 +7,15 @@ from tkinter import BaseWidget, Event, Misc, TclError, Text, ttk
 from tkinter.font import Font
 from typing import Any, Callable, Type, Union
 
+import tkinter.font as tkFont
+
 import pygments
 import pygments.lexer
 import pygments.lexers
 
 import toml
 from pyperclip import copy
-from tklinenums import TkLineNumbers
+from .tklinenums.tklinenums import TkLineNumbers
 
 from .schemeparser import _parse_scheme
 
@@ -90,6 +92,64 @@ class CodeView(Text):
 
         self._set_lexer(lexer)
         self._set_color_scheme(color_scheme)
+
+# TEST
+# -------------------------------------------------------
+
+        if self.linenums: self._line_numbers.bind("<Button-1>", self._on_line_number_click)
+
+    def _on_line_number_click(self, event):
+        x, y = event.x, event.y
+        # get the line number from the y-coordinate
+        line_number = int(self.index(f"@{x},{y}").split(".")[0])
+
+        self.toggle_fold(line_number)
+
+    def toggle_fold(self, line_number):
+        line_start = f"{line_number}.0"
+        line_end = f"{line_number}.end"
+
+        line_content = self.get(line_start, line_end)
+
+        # check if the line is already folded
+        if self.tag_ranges(f"fold_{line_number}"):            
+            # find the range of lines to unfold
+            next_line_number = line_number + 1
+            
+            while True:
+                next_line_start = f"{next_line_number}.0"
+                next_line_end = f"{next_line_number}.end+1c"
+
+                if f"fold_{line_number}" in self.tag_names(f"{next_line_number}.0"):
+                    self.tag_remove(f"fold_{line_number}", next_line_start, next_line_end)
+                else:
+                    break
+                
+                next_line_number += 1
+        
+        elif not line_content.startswith(" "):
+            start_line = line_number + 1
+            end_line = start_line
+            
+            while True:
+                end_line += 1
+                next_line_start = f"{end_line}.0"
+                next_line_end = f"{end_line}.end+1c"
+                next_line_content = self.get(next_line_start, next_line_end)
+
+                if next_line_content.startswith(" "):
+                    self.tag_add(f"fold_{line_number}", f"{start_line}.0", next_line_end)
+                else:
+                    break
+
+        # hide lines
+        self.tag_configure(f"fold_{line_number}", elide=True)
+        self._line_numbers.redraw()
+        # adjust the view to show the changes
+        self.see(line_start)
+
+# END TEST
+# -------------------------------------------------------
 
     def _select_all(self, *_) -> str:
         self.tag_add("sel", "1.0", "end")
