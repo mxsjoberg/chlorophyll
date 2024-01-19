@@ -61,15 +61,11 @@ class CodeView(Text):
 
         self.linenums = linenums
 
-        if linenums:
-            self._line_numbers = TkLineNumbers(
-                self._frame, self, justify=kwargs.get("justify", "left"), colors=linenums_theme
-            )
+        self._line_numbers = TkLineNumbers(self._frame, self, justify=kwargs.get("justify", "left"), colors=linenums_theme) if self.linenums else None
         self._vs = Scrollbar(self._frame, autohide=autohide_scrollbar, orient="vertical", command=self.yview)
         self._hs = Scrollbar(self._frame, autohide=autohide_scrollbar, orient="horizontal", command=self.xview)
 
-        if linenums:
-            self._line_numbers.grid(row=0, column=0, sticky="ns")
+        if self.linenums: self._line_numbers.grid(row=0, column=0, sticky="ns")
         self._vs.grid(row=0, column=2, sticky="ns")
         self._hs.grid(row=1, column=1, sticky="we")
 
@@ -86,8 +82,7 @@ class CodeView(Text):
         super().bind(f"<{contmand}-a>", self._select_all, add=True)
         super().bind(f"<{contmand}-Shift-Z>", self.redo, add=True)
         super().bind("<<ContentChanged>>", self.scroll_line_update, add=True)
-        if linenums:
-            super().bind("<Button-1>", self._line_numbers.redraw, add=True)
+        if self.linenums: super().bind("<Button-1>", self._line_numbers.redraw, add=True)
 
         self._orig = f"{self._w}_widget"
         self.tk.call("rename", self._w, self._orig)
@@ -278,8 +273,7 @@ class CodeView(Text):
 
     def vertical_scroll(self, first: str | float, last: str | float) -> CodeView:
         self._vs.set(first, last)
-        if self.linenums:
-            self._line_numbers.redraw()
+        if self.linenums: self._line_numbers.redraw()
 
     def scroll_line_update(self, event: Event | None = None) -> CodeView:
         self.horizontal_scroll(*self.xview())
