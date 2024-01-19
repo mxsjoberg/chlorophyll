@@ -102,14 +102,17 @@ class CodeView(Text):
 
         self.toggle_fold(line_number)
 
-    def toggle_fold(self, line_number):
+    def toggle_fold(self, line_number):        
         line_start = f"{line_number}.0"
         line_end = f"{line_number}.end"
 
         line_content = self.get(line_start, line_end)
 
         # check if the line is already folded
-        if self.tag_ranges(f"fold_{line_number}"):            
+        if self.tag_ranges(f"fold_{line_number}"):
+            self.tag_remove(f"folded", line_start, line_end)
+            self.tag_add(f"open", line_start, line_end)
+            
             # find the range of lines to unfold
             next_line_number = line_number + 1
             
@@ -125,11 +128,13 @@ class CodeView(Text):
                 next_line_number += 1
         
         elif not line_content.startswith(" "):
+            self.tag_remove(f"open", line_start, line_end)
+            self.tag_add(f"folded", line_start, line_end)
+
             start_line = line_number + 1
             end_line = start_line
             
             while True:
-                end_line += 1
                 next_line_start = f"{end_line}.0"
                 next_line_end = f"{end_line}.end+1c"
                 next_line_content = self.get(next_line_start, next_line_end)
@@ -138,6 +143,8 @@ class CodeView(Text):
                     self.tag_add(f"fold_{line_number}", f"{start_line}.0", next_line_end)
                 else:
                     break
+
+                end_line += 1
 
         # hide lines
         self.tag_configure(f"fold_{line_number}", elide=True)
