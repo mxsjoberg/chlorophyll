@@ -10,6 +10,7 @@ from typing import Any, Callable, Type, Union
 import pygments
 import pygments.lexer
 import pygments.lexers
+
 import toml
 from pyperclip import copy
 from tklinenums import TkLineNumbers
@@ -19,7 +20,6 @@ from .schemeparser import _parse_scheme
 color_schemes_dir = Path(__file__).parent / "colorschemes"
 
 LexerType = Union[Type[pygments.lexer.Lexer], pygments.lexer.Lexer]
-
 
 class Scrollbar(ttk.Scrollbar):
     def __init__(self, master: CodeView, autohide: bool, *args, **kwargs) -> None:
@@ -34,7 +34,6 @@ class Scrollbar(ttk.Scrollbar):
                 self.grid()
         super().set(low, high)
 
-
 class CodeView(Text):
     _w: str
     _builtin_color_schemes = {"ayu-dark", "ayu-light", "dracula", "mariana", "monokai"}
@@ -42,11 +41,12 @@ class CodeView(Text):
     def __init__(
         self,
         master: Misc | None = None,
-        lexer: LexerType = pygments.lexers.TextLexer,
+        lexer: LexerType = pygments.lexers.PythonLexer,
         color_scheme: dict[str, dict[str, str | int]] | str | None = None,
         tab_width: int = 4,
         linenums_theme: Callable[[], tuple[str, str]] | tuple[str, str] | None = None,
         autohide_scrollbar: bool = True,
+        linenums: bool = True,
         **kwargs,
     ) -> None:
         self._frame = ttk.Frame(master)
@@ -59,13 +59,17 @@ class CodeView(Text):
         super().__init__(self._frame, **kwargs)
         super().grid(row=0, column=1, sticky="nswe")
 
-        self._line_numbers = TkLineNumbers(
-            self._frame, self, justify=kwargs.get("justify", "left"), colors=linenums_theme
-        )
+        self.linenums = linenums
+
+        if linenums:
+            self._line_numbers = TkLineNumbers(
+                self._frame, self, justify=kwargs.get("justify", "left"), colors=linenums_theme
+            )
         self._vs = Scrollbar(self._frame, autohide=autohide_scrollbar, orient="vertical", command=self.yview)
         self._hs = Scrollbar(self._frame, autohide=autohide_scrollbar, orient="horizontal", command=self.xview)
 
-        self._line_numbers.grid(row=0, column=0, sticky="ns")
+        if linenums:
+            self._line_numbers.grid(row=0, column=0, sticky="ns")
         self._vs.grid(row=0, column=2, sticky="ns")
         self._hs.grid(row=1, column=1, sticky="we")
 
@@ -82,7 +86,8 @@ class CodeView(Text):
         super().bind(f"<{contmand}-a>", self._select_all, add=True)
         super().bind(f"<{contmand}-Shift-Z>", self.redo, add=True)
         super().bind("<<ContentChanged>>", self.scroll_line_update, add=True)
-        super().bind("<Button-1>", self._line_numbers.redraw, add=True)
+        if linenums:
+            super().bind("<Button-1>", self._line_numbers.redraw, add=True)
 
         self._orig = f"{self._w}_widget"
         self.tk.call("rename", self._w, self._orig)
@@ -273,7 +278,8 @@ class CodeView(Text):
 
     def vertical_scroll(self, first: str | float, last: str | float) -> CodeView:
         self._vs.set(first, last)
-        self._line_numbers.redraw()
+        if self.linenums:
+            self._line_numbers.redraw()
 
     def scroll_line_update(self, event: Event | None = None) -> CodeView:
         self.horizontal_scroll(*self.xview())
