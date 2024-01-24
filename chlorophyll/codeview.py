@@ -12,8 +12,8 @@ import pygments.lexer
 import pygments.lexers
 import toml
 from pyperclip import copy
-from .TkLineNums.tklinenums import TkLineNumbers
 
+from .TkLineNums.tklinenums import TkLineNumbers
 from .schemeparser import _parse_scheme
 
 color_schemes_dir = Path(__file__).parent / "colorschemes"
@@ -104,7 +104,7 @@ class CodeView(Text):
 
         self.toggle_fold(line_number)
 
-    def toggle_fold(self, line_number):        
+    def toggle_fold(self, line_number):
         line_start = f"{line_number}.0"
         line_end = f"{line_number}.end"
 
@@ -154,12 +154,70 @@ class CodeView(Text):
         # adjust the view to show the changes
         self.see(line_start)
 
+    # def _select_lines(self, event):
+    #     # print("_select_lines")
+
+    #     start_index = self.index("sel.first linestart")
+    #     end_index = self.index("sel.last lineend")
+
+    #     # print(start_index, end_index)
+
+    #     if start_index and end_index:
+
+    #         # if start_index and end_index:
+    #         #     selected_lines = self.get(start_index, end_index)
+    #         #     for line in selected_lines
+
+    #         for line_number in range(int(start_index.split('.')[0]), int(end_index.split('.')[0])):
+    #             # print(line_number)
+    #             # Get the start and end indices of the current line
+    #             line_start_index = f"{line_number}.0"
+    #             line_end_index = f"{line_number}.end-1c"
+
+    #             print(line_start_index, line_end_index)
+
+    #             # Get the content of the current line
+    #             # line_content = self.get(line_start_index, line_end_index)
+
+    #             self.tag_remove("sel", line_start_index, f"{line_number}.end")
+    #             self.tag_add("sel", line_start_index, line_end_index)
+
+    #     return "break"
+
 # END TEST
 # -------------------------------------------------------
 
     def _select_all(self, *_) -> str:
         self.tag_add("sel", "1.0", "end")
         self.mark_set("insert", "end")
+
+        # TEST
+
+        # # Get the current content of the Text widget
+        # content = self.get("1.0", "end-1c")
+
+        # # Replace spaces with the desired character (e.g., "A") in the displayed text
+        # # replaced_content = content.replace(" ", "·")
+
+        # replaced_content = ""
+
+        # # Iterate through the content character by character
+        # for char in content:
+        #     # Replace space with the desired character (e.g., "A")
+        #     if char == "·":
+        #         replaced_content += " "
+        #         # Add a tag to the replaced character
+        #         self.tag_add(f"meta", "end-1c")
+        #         self.tag_config(f"meta", foreground="red")  # Adjust tag configuration as needed
+        #     else:
+        #         replaced_content += char
+
+        # # Clear the Text widget and insert the modified content
+        # self.delete("1.0", "end")
+        # self.insert("1.0", replaced_content)
+
+        # END TEST
+
         return "break"
 
     def redo(self, event: Event | None = None) -> None:
